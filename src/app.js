@@ -5,6 +5,13 @@ const User = require("../src/model/user")
 app.use(express.json())
 const bcrypt = require("bcrypt");
 const saltRound=10;
+const jwt = require("jsonwebtoken")
+const cookieParser = require("cookie-parser")
+app.use(cookieParser())
+const dotenv = require("dotenv")
+dotenv.config()
+const {userAuth} = require("../middlewares/userAuth")
+const jwtSecretKey  = process.env.JWT_SECRET_KEY 
 
 app.post("/signup",async(req,res)=>{
     try {
@@ -24,23 +31,25 @@ app.post("/signup",async(req,res)=>{
     res.send("data saved successfully")
         
     } catch (error) {
-        console.log("Error"+error.message+error.code);
-        res.status(400).send("Error"+error.code+error.code) 
+        console.log("Error: "+error.message+error.code);
+        res.status(400).send("Error: "+error.code) 
     }
 })
-
+ 
 app.post("/login", async(req,res)=>{
     const {emailId, password} = req.body;
     try {
         const user = await User.findOne({emailId:emailId});
         if(!user) throw new Error("Invalid credential");
-        const isPasswordSame = bcrypt.compare(password, user.password);
+        const isPasswordSame = user.verifyPassword(password);
         if(!isPasswordSame) throw new Error("Invalid credential")
+        const token = await user.getJWT()
+        res.cookie("token", token)
         res.send("User login successful")
         
     } catch (error) {
-        console.log("error"+error.code+error.message);
-        res.send("eerror"+error.code+error.message)
+        console.log("error"+error.message);
+        res.send("eerror"+error.message)
     }
 })
 app.get("/user",async(req,res)=>{
@@ -68,7 +77,18 @@ app.delete("/user", async (req,res)=>{
     }
 })
 
-app.patch('/user',async(req,res)=>{
+
+app.post("/sendConnectionRequest",userAuth,async (req,res)=>{
+    console.log("connection request send")
+    res.send("connection request send")
+})
+app.get("/profile",userAuth,async(req,res)=>{
+  
+    const user= req?.user
+    console.log("token validation success", user)
+    res.send("Token validation success", user)
+})
+app.patch('/user',userAuth,async(req,res)=>{
     const userId = req.body.userId;
     
     try {
