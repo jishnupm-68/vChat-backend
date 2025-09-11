@@ -7,9 +7,15 @@ const { validateEditProfileData } = require("../../utils/validation");
 
 profileRouter.get("/profile/view",userAuth,async(req,res)=>{
   
-    const user= req?.user
+    try {
+        const user= req?.user
     console.log("token validation success", user)
-    res.send("Token validation success", user)
+    res.json({status:true, message:"Token validation success",data: user})
+        
+    } catch (error) {
+        console.log("error" , error.message)
+        res.json({status:false , message: error.message})
+    }
 })
 
 profileRouter.patch("/profile/edit", userAuth,async (req,res)=>{
@@ -23,7 +29,7 @@ profileRouter.patch("/profile/edit", userAuth,async (req,res)=>{
     console.log(loggedinUser)
     } catch (error) {
         console.log("Error: "+error.message)
-        res.status(400).send("Error: "+error.message);
+        res.status(400).json({status:false , message:error.message});
 
     }
 

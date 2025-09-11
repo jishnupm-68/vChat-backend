@@ -7,7 +7,6 @@ const { userAuth } = require("../../middlewares/userAuth");
 
 authRouter.post("/signup",async(req,res)=>{
     try {
-        console.log(req.body)
         // //creating new instance of User modal
         const {firstName, lastName, emailId, password} = req?.body;
         let passwordHash =await bcrypt.hash(password, saltRound)
@@ -19,11 +18,11 @@ authRouter.post("/signup",async(req,res)=>{
             });
     const data = await user.save()
     console.log("data saved successfully", data)
-    res.send("data saved successfully")
+    res.json({status:true, message:"data saved successfully"})
         
     } catch (error) {
         console.log("Error: "+error.message+error.code);
-        res.status(400).send("Error: "+error.code) 
+        res.status(400).json({sttaus:false, messge:error.message}) 
     }
 })
 
@@ -32,24 +31,31 @@ authRouter.post("/login", async(req,res)=>{
     try {
         const user = await User.findOne({emailId:emailId});
         if(!user) throw new Error("Invalid credential ");
-        const isPasswordSame = user.verifyPassword(password);
+        const isPasswordSame = await user.verifyPassword(password);
+        console.log("password status", isPasswordSame)
         if(!isPasswordSame) throw new Error("Invalid credential ")
         const token = await user.getJWT()
         res.cookie("token", token)
-        res.send("User login successful")
+        console.log("login success")
+        res.json({status:true, message:"User login successful", data:user})
         
     } catch (error) {
         console.log("error"+error.message);
-        res.send("eerror"+error.message)
+        res.json({status:false, message: error.message})
     }
-})
+}) 
 
 authRouter.post("/logout", async(req,res)=>{
-    res.cookie("token", null,{
+    try {
+        res.cookie("token", null,{
         expires:new Date(Date.now())
-    })
-    res.send("Logout successful")
+        })
+    res.json({status:true, message:"Logout successful"})
 
-})
+    } catch (error) {
+        console.log("error: ", error.message)
+        res.json({status:false, message:"Logout failed"})
+    }
+}) 
  
 module.exports = authRouter;

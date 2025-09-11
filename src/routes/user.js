@@ -65,7 +65,7 @@ userRouter.get("/feed",
                     {fromUserId:loggedInUser._id},
                     {toUserId:loggedInUser._id}
                 ]
-            }).select("fromUserId toUserId")
+            }).select("fromUserId toUserId ")
             .populate("fromUserId","firstName")
             .populate("toUserId","firstName")
 
@@ -82,11 +82,11 @@ userRouter.get("/feed",
                 }},
             {_id:{$ne:loggedInUser._id}}]
             })
-            .select("firstName lastName gender age ")
+            .select("firstName lastName gender age about ")
             .skip(skip)
             .limit(limit)
             .lean()
-            res.json({message:"Feed fetched successfully", data:users})
+            res.json({status:true, message:"Feed fetched successfully", data:users})
             
         } catch (error) {
             console.log(error)
