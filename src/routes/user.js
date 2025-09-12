@@ -13,7 +13,7 @@ userRouter.get("/user/requests/received",
         const connectionRequest = await connectionRequestModel.find({
             toUserId:loggedInUser._id,
             status:"interested"
-        }).populate("fromUserId",["firstName", "lastName"])
+        }).populate("fromUserId",["firstName", "lastName", "photoUrl" , "about", "age", "gender"])
         res.json({
             message:"data fetched successfully",
             data:connectionRequest
@@ -32,18 +32,23 @@ userRouter.get("/user/connections",
             const loggedInUser = req.user;
             const connectionRequest = await connectionRequestModel.find({
                 $or:[
-                    {toUserId:loggedInUser._id, status:"accepted"},
-                    {fromUserId:loggedInUser._id, status:"accpted"}
+                    {toUserId:loggedInUser?._id, status:"accepted"},
+                    {fromUserId:loggedInUser?._id, status:"accepted"}
                 ]
             })
-            .populate("fromUserId",["firstName", "lastName"])
-            .populate("toUserId",["firstName", "lastName"])
+            .populate("fromUserId",["firstName", "lastName", "photoUrl","about", "skills"])
+            .populate("toUserId",["firstName", "lastName", "photoUrl","about", "skills"])
+           
             let data = connectionRequest.map((row)=>{
-                if(row.fromUserId._id.equals(loggedInUser._id)) return row.toUserId
+                if(row?.fromUserId?._id.equals(loggedInUser?._id)) return row.toUserId
                 return row.fromUserId
             })
+             console.log("connection requests", connectionRequest, "data", data)
             if(!connectionRequest) throw new Error ("no connection request found")
-            res.json({messge:"connection request fetched successfully", data:data})
+            res.json({
+        status:true ,
+         message:"connection request fetched successfully",
+          data:data})
             
         } catch (error) {
             res.send("Error: "+error.message);
@@ -71,8 +76,8 @@ userRouter.get("/feed",
 
             const hideUsersFromFeed = new Set();
             connectionRequest.forEach((req)=>{
-                hideUsersFromFeed.add(req.fromUserId._id.toString());
-                hideUsersFromFeed.add(req.toUserId._id.toString())
+                hideUsersFromFeed.add(req?.fromUserId?._id.toString());
+                hideUsersFromFeed.add(req?.toUserId?._id.toString())
             })
 
             const users = await User.find({
@@ -82,7 +87,7 @@ userRouter.get("/feed",
                 }},
             {_id:{$ne:loggedInUser._id}}]
             })
-            .select("firstName lastName gender age about ")
+            .select("firstName lastName gender age about photoUrl ")
             .skip(skip)
             .limit(limit)
             .lean()
