@@ -9,7 +9,6 @@ profileRouter.get("/profile/view",userAuth,async(req,res)=>{
   
     try {
         const user= req?.user
-    console.log("token validation success", user)
     res.json({status:true, message:"Token validation success",data: user})
         
     } catch (error) {

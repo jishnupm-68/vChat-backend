@@ -17,8 +17,9 @@ authRouter.post("/signup",async(req,res)=>{
                 password:passwordHash
             });
     const data = await user.save()
-    console.log("data saved successfully", data)
-    res.json({status:true, message:"data saved successfully"})
+    const token = await user.getJWT()
+    res.cookie("token", token)
+    res.json({status:true, message:"data saved successfully", data:user})
         
     } catch (error) {
         console.log("Error: "+error.message+error.code);
@@ -32,11 +33,9 @@ authRouter.post("/login", async(req,res)=>{
         const user = await User.findOne({emailId:emailId});
         if(!user) throw new Error("Invalid credential ");
         const isPasswordSame = await user.verifyPassword(password);
-        console.log("password status", isPasswordSame)
         if(!isPasswordSame) throw new Error("Invalid credential ")
         const token = await user.getJWT()
         res.cookie("token", token)
-        console.log("login success")
         res.json({status:true, message:"User login successful", data:user})
         
     } catch (error) {

@@ -43,7 +43,6 @@ userRouter.get("/user/connections",
                 if(row?.fromUserId?._id.equals(loggedInUser?._id)) return row.toUserId
                 return row.fromUserId
             })
-             console.log("connection requests", connectionRequest, "data", data)
             if(!connectionRequest) throw new Error ("no connection request found")
             res.json({
         status:true ,
