@@ -1,5 +1,4 @@
-const dotenv= require("dotenv")
-dotenv.config()
+
 const validator = require("validator")
 const jwtSecretKey = process.env.JWT_SECRET_KEY 
 const bcrypt =  require("bcrypt")

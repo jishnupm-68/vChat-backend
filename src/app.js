@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const dotenv = require("dotenv")
+dotenv.config()
 const {connectDb}=require('../config/db')
 const cors  = require("cors")
 app.use(cors({
@@ -12,8 +14,7 @@ app.use(express.json())
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
 app.use(cookieParser())
-const dotenv = require("dotenv")
-dotenv.config()
+
 const authRouter = require('../src/routes/auth');
 const requestRouter = require('../src/routes/request');
 const profileRouter = require('../src/routes/profile');
@@ -28,7 +29,7 @@ app.use("/",userRouter)
 connectDb()
 .then(()=>{
     console.log("Successfully connected to the database")
-    app.listen(3000, ()=>{
+    app.listen(process.env.PORT, ()=>{
     console.log("server running");
 })  
 })
