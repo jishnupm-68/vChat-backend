@@ -1,11 +1,14 @@
 const express = require("express");
 const app = express();
+const nocache = require("nocache")
 const dotenv = require("dotenv")
 dotenv.config()
 const {connectDb}=require('../config/db')
+
 const cors  = require("cors")
+app.use(nocache())
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin:process.env.CORS_ORIGIN_STRING,
     credentials:true
 }))
 app.use(express.json())
