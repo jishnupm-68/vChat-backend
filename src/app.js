@@ -1,9 +1,14 @@
 const express = require("express");
+const {createServer} = require("http");
+
 const app = express();
 const nocache = require("nocache")
 const dotenv = require("dotenv")
 dotenv.config()
 const {connectDb}=require('../config/db')
+const {initializeSocket} = require("../utils/socket")
+const httpServer = createServer(app);
+initializeSocket(httpServer)
 
 const cors  = require("cors")
 app.use(nocache())
@@ -24,6 +29,7 @@ const profileRouter = require('../src/routes/profile');
 const userRouter = require("./routes/user");
 
 
+
 app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use("/", requestRouter)
@@ -32,7 +38,7 @@ app.use("/",userRouter)
 connectDb()
 .then(()=>{
     console.log("Successfully connected to the database")
-    app.listen(process.env.PORT, ()=>{
+    httpServer.listen(process.env.PORT, ()=>{
     console.log("server running");
 })  
 })
