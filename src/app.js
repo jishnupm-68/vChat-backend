@@ -27,6 +27,7 @@ const authRouter = require('../src/routes/auth');
 const requestRouter = require('../src/routes/request');
 const profileRouter = require('../src/routes/profile');
 const userRouter = require("./routes/user");
+const chatRouter = require("./routes/chat");
 
 
 
@@ -34,6 +35,7 @@ app.use('/', authRouter);
 app.use('/', profileRouter);
 app.use("/", requestRouter)
 app.use("/",userRouter)
+app.use('/', chatRouter)
 
 connectDb()
 .then(()=>{
@@ -43,5 +45,5 @@ connectDb()
 })  
 })
 .catch((error)=>{
-    console.log("There is a error while connecting to the database", error?.message, error?.code)
+    ("There is a error while connecting to the database", error?.message, error?.code)
 })

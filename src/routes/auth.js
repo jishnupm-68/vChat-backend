@@ -7,7 +7,7 @@ const { userAuth } = require("../../middlewares/userAuth");
 
 authRouter.post("/signup",async(req,res)=>{
     try {
-        // //creating new instance of User modal
+        //creating new instance of User modal
         const {firstName, lastName, emailId, password} = req?.body;
         let passwordHash =await bcrypt.hash(password, saltRound)
     const user = new User({
